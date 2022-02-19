@@ -171,6 +171,8 @@ set(XEUS_CLING_SRC
     src/xmagics/execution.hpp
     src/xmagics/os.cpp
     src/xmagics/os.hpp
+    src/xmagics/benchmark.cpp
+    src/xmagics/benchmark.hpp
     src/xmime_internal.hpp
 )
 
