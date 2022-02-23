@@ -1,6 +1,6 @@
 /***********************************************************************************
-* Copyright (c) 2016, Johan Mabille, Loic Gouarin, Sylvain Corlay, Wolf Vollprecht *
-* Copyright (c) 2016, QuantStack                                                   *
+* Copyright (c) 2020, Jonas Hahnfeld                                               *
+* Copyright (c) 2020, Chair for Computer Science 12 (HPC), RWTH Aachen University  *
 *                                                                                  *
 * Distributed under the terms of the BSD 3-Clause License.                         *
 *                                                                                  *
@@ -10,8 +10,8 @@
 #ifndef XMAGICS_BENCHMARK_HPP
 #define XMAGICS_BENCHMARK_HPP
 
-#include <cstddef>
 #include <string>
+#include <vector>
 
 #include "cling/Interpreter/Interpreter.h"
 
@@ -20,34 +20,25 @@
 
 namespace xcpp
 {
-    class benchmark : public xmagic_line_cell
+    class benchmark: public xmagic_cell
     {
     public:
 
-        benchmark(cling::Interpreter* p);
-
-        virtual void operator()(const std::string& line) override
-        {
-            std::string cline = line;
-            std::string cell = "";
-            execute(cline, cell);
-        }
-
-        virtual void operator()(const std::string& line, const std::string& cell) override
-        {
-            std::string cline = line;
-            std::string ccell = cell;
-            execute(cline, ccell);
-        }
+        benchmark(cling::Interpreter& i) : m_interpreter(i) {}
+        xoptions get_options();
+        virtual void operator()(const std::string& line, const std::string& cell) override;
 
     private:
 
-        cling::Interpreter* m_interpreter;
+        std::string generate_fns(const std::string& cell, std::string& main,
+                                 std::string& unique_fn);
+        bool generate_obj(std::string& ObjectFile, bool EnableDebugInfo);
+        bool generate_exe(const std::string& ObjectFile,
+                          const std::string& ExeFile,
+                          const std::vector<std::string>& LinkerOptions);
 
-        xoptions get_options();
-        std::string inner(std::size_t number, const std::string& code) const;
-        std::string _format_time(double timespan, std::size_t precision) const;
-        void execute(std::string& line, std::string& cell);
+        cling::Interpreter& m_interpreter;
+        unsigned int m_unique = 0;
     };
 }
 #endif
